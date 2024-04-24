@@ -1,3 +1,28 @@
+## ament_index (jazzy) - 1.8.1-1
+
+The packages in the `ament_index` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release --track jazzy --rosdistro jazzy ament_index` on `Wed, 24 Apr 2024 16:52:21 -0000`
+
+These packages were released:
+- `ament_index_cpp`
+- `ament_index_python`
+
+Version of package(s) in repository `ament_index`:
+
+- upstream repository: https://github.com/ament/ament_index.git
+- release repository: https://github.com/ros2-gbp/ament_index-release.git
+- rosdistro version: `1.8.0-2`
+- old version: `1.8.0-2`
+- new version: `1.8.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## ament_index (rolling) - 1.8.0-1
 
 The packages in the `ament_index` repository were released into the `rolling` distro by running `/usr/bin/bloom-release ament_index --rosdistro rolling` on `Thu, 28 Mar 2024 08:09:46 -0000`
