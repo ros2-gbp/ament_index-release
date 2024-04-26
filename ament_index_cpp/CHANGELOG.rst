@@ -2,7 +2,7 @@
 Changelog for package ament_index_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.8.1 (2024-04-24)
+1.9.0 (2024-04-26)
 ------------------
 * Update quality declaration documents (`#94 <https://github.com/ament/ament_index/issues/94>`_)
 * Contributors: Christophe Bedard
