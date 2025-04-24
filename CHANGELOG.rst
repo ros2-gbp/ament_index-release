@@ -2,6 +2,12 @@
 Changelog for package ament_index_python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.0 (2025-04-24)
+-------------------
+
+1.11.0 (2025-04-24)
+-------------------
+
 1.10.2 (2025-04-17)
 -------------------
 * Add py.typed to package_data (`#100 <https://github.com/ament/ament_index/issues/100>`_)
