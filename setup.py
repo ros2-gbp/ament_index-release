@@ -5,7 +5,7 @@ package_name = 'ament_index_python'
 
 setup(
     name=package_name,
-    version='1.12.0',
+    version='1.12.1',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -28,7 +28,6 @@ setup(
     keywords=['ROS'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -37,7 +36,11 @@ setup(
 A Python API to find resources based on their type in the ament resource index
 and get the content of individual resources.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ament_index = ament_index_python.cli:main',
