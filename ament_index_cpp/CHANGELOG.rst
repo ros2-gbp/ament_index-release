@@ -2,17 +2,10 @@
 Changelog for package ament_index_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.13.0 (2025-12-23)
+1.11.1 (2025-12-23)
 -------------------
-* Extend API to use std::filesystem (`#104 <https://github.com/ament/ament_index/issues/104>`_)
-* Fix CMake deprecation (`#102 <https://github.com/ament/ament_index/issues/102>`_)
-* Contributors: Alejandro Hernández Cordero, mosfet80
-
-1.12.1 (2025-07-30)
--------------------
-
-1.12.0 (2025-04-24)
--------------------
+* Fix CMake deprecation (`#102 <https://github.com/ament/ament_index/issues/102>`_) (`#103 <https://github.com/ament/ament_index/issues/103>`_)
+* Contributors: mergify[bot]
 
 1.11.0 (2025-04-24)
 -------------------
