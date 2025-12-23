@@ -1,3 +1,28 @@
+## ament_index (kilted) - 1.11.1-1
+
+The packages in the `ament_index` repository were released into the `kilted` distro by running `/usr/bin/bloom-release --rosdistro kilted --track kilted ament_index` on `Tue, 23 Dec 2025 09:50:41 -0000`
+
+These packages were released:
+- `ament_index_cpp`
+- `ament_index_python`
+
+Version of package(s) in repository `ament_index`:
+
+- upstream repository: https://github.com/ament/ament_index.git
+- release repository: https://github.com/ros2-gbp/ament_index-release.git
+- rosdistro version: `1.11.0-1`
+- old version: `1.11.0-1`
+- new version: `1.11.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## ament_index (rolling) - 1.13.0-1
 
 The packages in the `ament_index` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ament_index` on `Tue, 23 Dec 2025 09:32:53 -0000`
