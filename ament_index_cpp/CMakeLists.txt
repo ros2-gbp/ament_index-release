@@ -19,6 +19,7 @@ unless the library was explicitly added as a static library."
   ON)
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gen_version_h REQUIRED)
 
 add_library(${PROJECT_NAME}
   src/get_package_prefix.cpp
@@ -45,9 +46,17 @@ if(BUILD_TESTING)
     target_include_directories(${PROJECT_NAME}_utest PUBLIC include)
     target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})
   endif()
+
+  ament_add_gtest(${PROJECT_NAME}_utest_deprecated test/utest_deprecated.cpp)
+  if(TARGET ${PROJECT_NAME}_utest_deprecated)
+    target_include_directories(${PROJECT_NAME}_utest_deprecated PUBLIC include)
+    target_link_libraries(${PROJECT_NAME}_utest_deprecated ${PROJECT_NAME})
+  endif()
+
 endif()
 
 ament_package()
+ament_generate_version_header(ament_index_cpp)
 
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
