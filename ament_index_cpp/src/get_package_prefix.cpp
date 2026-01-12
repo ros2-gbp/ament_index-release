@@ -23,20 +23,11 @@
 namespace ament_index_cpp
 {
 
-static size_t package_not_found_count = 0;
-
 static
 std::string
 format_package_not_found_error_message(const std::string & package_name)
 {
-  std::string message = "package '" + package_name + "' not found";
-
-  // Don't need to print out the package paths more than once
-  if (package_not_found_count++ > 0) {
-    return message;
-  }
-
-  message += ", searching: [";
+  std::string message = "package '" + package_name + "' not found, searching: [";
   auto search_paths = get_search_paths();
   for (const auto & path : search_paths) {
     message += path + ", ";

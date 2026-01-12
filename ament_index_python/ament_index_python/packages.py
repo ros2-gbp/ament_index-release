@@ -15,9 +15,7 @@
 import os
 import pathlib
 import re
-from typing import Dict
 import warnings
-
 
 from .resources import get_resource
 from .resources import get_resources
@@ -28,7 +26,7 @@ class PackageNotFoundError(KeyError):
     pass
 
 
-def get_packages_with_prefixes() -> Dict[str, str]:
+def get_packages_with_prefixes():
     """
     Return a dict of package names to the prefixes in which they are found.
 
@@ -38,7 +36,7 @@ def get_packages_with_prefixes() -> Dict[str, str]:
     return get_resources('packages')
 
 
-def get_package_prefix(package_name: str) -> str:
+def get_package_prefix(package_name):
     """
     Return the installation prefix directory of the given package.
 
@@ -64,7 +62,7 @@ def get_package_prefix(package_name: str) -> str:
     return package_prefix
 
 
-def get_package_share_directory(package_name: str, print_warning: bool = True) -> str:
+def get_package_share_directory(package_name, print_warning=True):
     """
     Return the share directory of the given package.
 
@@ -85,7 +83,7 @@ def get_package_share_directory(package_name: str, print_warning: bool = True) -
     return path
 
 
-def get_package_share_path(package_name: str, print_warning: bool = True) -> pathlib.Path:
+def get_package_share_path(package_name, print_warning=True):
     """
     Return the share directory of the given package as a pathlib.Path.
 

@@ -13,15 +13,9 @@
 # limitations under the License.
 
 import os
-import sys
-from typing import Dict, Literal, Tuple, Union
-
-if sys.version_info >= (3, 10):
-    Set = set
-else:
-    from typing import Set
 
 from .constants import RESOURCE_INDEX_SUBFOLDER
+
 from .search_paths import get_search_paths
 
 
@@ -37,7 +31,7 @@ class InvalidResourceNameError(ValueError):
     pass
 
 
-def _name_is_invalid(resource_name: str) -> bool:
+def _name_is_invalid(resource_name):
     """
     Get the whether a resource name or a resource type name is invalid.
 
@@ -55,7 +49,7 @@ def _name_is_invalid(resource_name: str) -> bool:
     return ('/' in resource_name) or ('\\' in resource_name)
 
 
-def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
+def get_resource(resource_type, resource_name):
     """
     Get the content of a specific resource and its prefix path.
 
@@ -93,7 +87,7 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
         "Could not find the resource '%s' of type '%s'" % (resource_name, resource_type))
 
 
-def get_resources(resource_type: str) -> Dict[str, str]:
+def get_resources(resource_type):
     """
     Get the resource names of all resources of the specified type.
 
@@ -121,7 +115,7 @@ def get_resources(resource_type: str) -> Dict[str, str]:
     return resources
 
 
-def get_resource_types() -> Set[str]:
+def get_resource_types():
     """
     Get the resource types.
 
@@ -141,7 +135,7 @@ def get_resource_types() -> Set[str]:
     return resource_types
 
 
-def has_resource(resource_type: str, resource_name: str) -> Union[str, Literal[False]]:
+def has_resource(resource_type, resource_name):
     """
     Check if a specific resource exists.
 
