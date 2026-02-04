@@ -14,6 +14,7 @@
 
 #include "ament_index_cpp/get_package_prefix.hpp"
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -23,11 +24,20 @@
 namespace ament_index_cpp
 {
 
+static size_t package_not_found_count = 0;
+
 static
 std::string
 format_package_not_found_error_message(const std::string & package_name)
 {
-  std::string message = "package '" + package_name + "' not found, searching: [";
+  std::string message = "package '" + package_name + "' not found";
+
+  // Don't need to print out the package paths more than once
+  if (package_not_found_count++ > 0) {
+    return message;
+  }
+
+  message += ", searching: [";
   auto search_paths = get_search_paths();
   for (const auto & path : search_paths) {
     message += path + ", ";
@@ -56,4 +66,13 @@ get_package_prefix(const std::string & package_name)
   return prefix_path;
 }
 
+void
+get_package_prefix(const std::string & package_name, std::filesystem::path & path)
+{
+  try {
+    path = get_package_prefix(package_name);
+  } catch (const std::runtime_error &) {
+    throw PackageNotFoundError(package_name);
+  }
+}
 }  // namespace ament_index_cpp

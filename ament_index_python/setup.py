@@ -5,7 +5,7 @@ package_name = 'ament_index_python'
 
 setup(
     name=package_name,
-    version='1.4.1',
+    version='1.11.3',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -16,12 +16,13 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
+    package_data={'': ['py.typed']},
     install_requires=['setuptools'],
     zip_safe=True,
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
-    maintainer='Audrow Nash',
-    maintainer_email='audrow@openrobotics.org',
+    maintainer='Dharini Dutia',
+    maintainer_email='dharini@openrobotics.org',
     url='https://github.com/ament/ament_index',
     download_url='https://github.com/ament/ament_index/releases',
     keywords=['ROS'],
