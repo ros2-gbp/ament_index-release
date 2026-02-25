@@ -2,13 +2,42 @@
 Changelog for package ament_index_python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.8.3 (2026-02-04)
-------------------
+1.13.2 (2026-02-25)
+-------------------
 
-1.8.2 (2026-01-12)
-------------------
+1.13.1 (2026-01-09)
+-------------------
 
-1.8.1 (2024-04-24)
+1.13.0 (2025-12-23)
+-------------------
+
+1.12.1 (2025-07-30)
+-------------------
+* fix setuptools deprecations (`#101 <https://github.com/ament/ament_index/issues/101>`_)
+* Contributors: mosfet80
+
+1.12.0 (2025-04-24)
+-------------------
+
+1.11.0 (2025-04-24)
+-------------------
+
+1.10.2 (2025-04-17)
+-------------------
+* Add py.typed to package_data (`#100 <https://github.com/ament/ament_index/issues/100>`_)
+* Contributors: Michael Carlstrom
+
+1.10.1 (2024-11-20)
+-------------------
+* Add test_xmllint to ament_index_python. (`#96 <https://github.com/ament/ament_index/issues/96>`_)
+* Contributors: Chris Lalancette
+
+1.10.0 (2024-10-03)
+-------------------
+* Add ament_mypy unit test and export types (`#95 <https://github.com/ament/ament_index/issues/95>`_)
+* Contributors: Michael Carlstrom
+
+1.9.0 (2024-04-26)
 ------------------
 * Update quality declaration documents (`#94 <https://github.com/ament/ament_index/issues/94>`_)
 * Contributors: Christophe Bedard

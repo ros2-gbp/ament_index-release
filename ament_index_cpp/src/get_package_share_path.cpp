@@ -1,4 +1,4 @@
-// Copyright 2017 Open Source Robotics Foundation, Inc.
+// Copyright 2026 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ament_index_cpp/get_packages_with_prefixes.hpp"
+#include "ament_index_cpp/get_package_share_path.hpp"
 
-#include <map>
+#include <filesystem>
 #include <string>
 
-#include "ament_index_cpp/get_resources.hpp"
+#include "ament_index_cpp/get_package_prefix.hpp"
 
 namespace ament_index_cpp
 {
 
-std::map<std::string, std::string>
-get_packages_with_prefixes()
+std::filesystem::path get_package_share_path(
+  const std::string & package_name)
 {
-  std::map<std::string, std::string> result;
-  std::map<std::string, std::filesystem::path> resources = get_resources_by_name("packages");
-  for (const auto & resource : resources) {
-    result[resource.first] = resource.second.string();
-  }
-  return result;
+  std::filesystem::path result;
+  get_package_prefix(package_name, result);
+  return result / "share" / package_name;
 }
 
 }  // namespace ament_index_cpp

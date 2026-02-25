@@ -22,7 +22,7 @@
 #include <string>
 
 #include "ament_index_cpp/get_package_prefix.hpp"
-#include "ament_index_cpp/get_package_share_directory.hpp"
+#include "ament_index_cpp/get_package_share_path.hpp"
 #include "ament_index_cpp/get_packages_with_prefixes.hpp"
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
@@ -66,40 +66,40 @@ void set_ament_prefix_path(std::list<std::string> subfolders)
   }
 }
 
-TEST(AmentIndexCpp, empty_search_paths) {
+TEST(AmentIndexCpp, empty_search_paths_std) {
   std::list<std::string> subfolders;
   set_ament_prefix_path(subfolders);
-  EXPECT_THROW(ament_index_cpp::get_search_paths(), std::runtime_error);
+  EXPECT_THROW(ament_index_cpp::get_searcheable_paths(), std::runtime_error);
 }
 
-TEST(AmentIndexCpp, search_paths) {
+TEST(AmentIndexCpp, search_paths_std) {
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
-  std::list<std::string> search_paths = ament_index_cpp::get_search_paths();
+  std::list<std::filesystem::path> search_paths = ament_index_cpp::get_searcheable_paths();
   EXPECT_EQ(search_paths.size(), 2UL);
 }
 
-TEST(AmentIndexCpp, not_existing_search_paths) {
+TEST(AmentIndexCpp, not_existing_search_paths_std) {
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");
   subfolders.push_back("not_existing_prefix");
   set_ament_prefix_path(subfolders);
-  std::list<std::string> search_paths = ament_index_cpp::get_search_paths();
+  std::list<std::filesystem::path> search_paths = ament_index_cpp::get_searcheable_paths();
   EXPECT_EQ(search_paths.size(), 1UL);
 }
 
-TEST(AmentIndexCpp, get_empty_resources) {
-  EXPECT_THROW(ament_index_cpp::get_resources(""), std::runtime_error);
+TEST(AmentIndexCpp, get_empty_resources_std) {
+  EXPECT_THROW(ament_index_cpp::get_resources_by_name(""), std::runtime_error);
 }
 
 TEST(AmentIndexCpp, get_unknown_resources) {
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");
   set_ament_prefix_path(subfolders);
-  std::map<std::string, std::string> resources =
-    ament_index_cpp::get_resources("unknown_resource_type");
+  std::map<std::string, std::filesystem::path> resources =
+    ament_index_cpp::get_resources_by_name("unknown_resource_type");
   EXPECT_EQ(resources.size(), 0UL);
 }
 
@@ -109,7 +109,8 @@ TEST(AmentIndexCpp, get_resources) {
   subfolders.push_back("prefix1");
   set_ament_prefix_path(subfolders);
   // There are two resources of this type
-  std::map<std::string, std::string> resources = ament_index_cpp::get_resources("resource_type1");
+  std::map<std::string, std::filesystem::path> resources =
+    ament_index_cpp::get_resources_by_name("resource_type1");
   EXPECT_EQ(resources.size(), 2UL);
   for (auto it : resources) {
     EXPECT_EQ(it.second, generate_subfolder_path("prefix1"));
@@ -124,7 +125,8 @@ TEST(AmentIndexCpp, get_resources_overlay) {
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
   // This resource type is found in prefix1 and prefix2
-  std::map<std::string, std::string> resources = ament_index_cpp::get_resources("resource_type2");
+  std::map<std::string, std::filesystem::path> resources =
+    ament_index_cpp::get_resources_by_name("resource_type2");
   EXPECT_EQ(resources.size(), 2UL);
   for (auto it : resources) {
     EXPECT_TRUE(it.first == "foo" || it.first == "bar");
@@ -138,7 +140,8 @@ TEST(AmentIndexCpp, get_resources_underlay) {
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
   // This resource type is only found in prefix2
-  std::map<std::string, std::string> resources = ament_index_cpp::get_resources("resource_type3");
+  std::map<std::string, std::filesystem::path> resources =
+    ament_index_cpp::get_resources_by_name("resource_type3");
   EXPECT_EQ(resources.size(), 1UL);
   for (auto it : resources) {
     EXPECT_EQ(it.second, generate_subfolder_path("prefix2"));
@@ -148,26 +151,27 @@ TEST(AmentIndexCpp, get_resources_underlay) {
 
 TEST(AmentIndexCpp, get_empty_resource) {
   std::string content;
-  EXPECT_THROW(ament_index_cpp::get_resource("", "", content), std::runtime_error);
+  auto result = ament_index_cpp::get_resource("", "");
+  EXPECT_EQ(result.resourcePath, std::nullopt);
+  EXPECT_EQ(result.contents, "");
 }
 
 TEST(AmentIndexCpp, get_unknown_resource) {
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  bool success = ament_index_cpp::get_resource("resource_type4", "bar", content);
-  EXPECT_FALSE(success);
+  auto result = ament_index_cpp::get_resource("resource_type4", "bar");
+  EXPECT_EQ(result.resourcePath, std::nullopt);
+  EXPECT_EQ(result.contents, "");
 }
 
 TEST(AmentIndexCpp, get_resource) {
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  bool success = ament_index_cpp::get_resource("resource_type4", "foo", content);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(content, "foo");
+  auto result = ament_index_cpp::get_resource("resource_type4", "foo");
+  EXPECT_NE(result.resourcePath, std::nullopt);
+  EXPECT_EQ(result.contents, "foo");
 }
 
 TEST(AmentIndexCpp, get_resource_underlay) {
@@ -176,11 +180,9 @@ TEST(AmentIndexCpp, get_resource_underlay) {
   subfolders.push_back("prefix1");
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  // This resource is only found in the underlay
-  bool success = ament_index_cpp::get_resource("resource_type2", "bar", content);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(content, "");
+  auto result = ament_index_cpp::get_resource("resource_type2", "bar");
+  EXPECT_NE(result.resourcePath, std::nullopt);
+  EXPECT_EQ(result.contents, "");
 }
 
 TEST(AmentIndexCpp, get_resource_overlay) {
@@ -189,11 +191,9 @@ TEST(AmentIndexCpp, get_resource_overlay) {
   subfolders.push_back("prefix1");
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  // This resource is in both the overlay and the underlay
-  bool success = ament_index_cpp::get_resource("resource_type5", "foo", content);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(content, "foo1");
+  auto result = ament_index_cpp::get_resource("resource_type5", "foo");
+  EXPECT_NE(result.resourcePath, std::nullopt);
+  EXPECT_EQ(result.contents, "foo1");
 }
 
 TEST(AmentIndexCpp, get_resource_overlay_base_path) {
@@ -202,12 +202,8 @@ TEST(AmentIndexCpp, get_resource_overlay_base_path) {
   subfolders.push_back("prefix1");
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  std::string base_path;
-  // This resource is only found in the overlay
-  bool success = ament_index_cpp::get_resource("resource_type2", "foo", content, &base_path);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(base_path, generate_subfolder_path("prefix1"));
+  auto result = ament_index_cpp::get_resource("resource_type2", "foo");
+  EXPECT_EQ(result.resourcePath, generate_subfolder_path("prefix1"));
 }
 
 TEST(AmentIndexCpp, get_resource_underlay_base_path) {
@@ -216,12 +212,8 @@ TEST(AmentIndexCpp, get_resource_underlay_base_path) {
   subfolders.push_back("prefix1");
   subfolders.push_back("prefix2");
   set_ament_prefix_path(subfolders);
-  std::string content;
-  std::string base_path;
-  // This resource is only found in the underlay
-  bool success = ament_index_cpp::get_resource("resource_type2", "bar", content, &base_path);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(base_path, generate_subfolder_path("prefix2"));
+  auto result = ament_index_cpp::get_resource("resource_type2", "bar");
+  EXPECT_EQ(result.resourcePath, generate_subfolder_path("prefix2"));
 }
 
 TEST(AmentIndexCpp, get_package_prefix) {
@@ -230,32 +222,37 @@ TEST(AmentIndexCpp, get_package_prefix) {
   subfolders.push_back("prefix1");  // only contains foo and bar packages
   subfolders.push_back("prefix2");  // only contains bar and baz packages
   set_ament_prefix_path(subfolders);
+  std::filesystem::path path_result;
+  ament_index_cpp::get_package_prefix("foo", path_result);
   // foo is found in prefix 1
-  EXPECT_EQ(generate_subfolder_path("prefix1"), ament_index_cpp::get_package_prefix("foo"));
+  EXPECT_EQ(generate_subfolder_path("prefix1"), path_result.string());
   // bar is in both, but prefix 1 takes precedence
-  EXPECT_EQ(generate_subfolder_path("prefix1"), ament_index_cpp::get_package_prefix("bar"));
+  ament_index_cpp::get_package_prefix("bar", path_result);
+  EXPECT_EQ(generate_subfolder_path("prefix1"), path_result.string());
   // baz is found in prefix 2 only
-  EXPECT_EQ(generate_subfolder_path("prefix2"), ament_index_cpp::get_package_prefix("baz"));
+  ament_index_cpp::get_package_prefix("baz", path_result);
+  EXPECT_EQ(generate_subfolder_path("prefix2"), path_result.string());
   // exception when package is not found
   EXPECT_THROW(
-    ament_index_cpp::get_package_prefix("does_not_exist"),
+    ament_index_cpp::get_package_prefix("does_not_exist", path_result),
     ament_index_cpp::PackageNotFoundError);
   // exception when the package name is empty
   EXPECT_THROW(
-    ament_index_cpp::get_package_prefix(""),
-    std::runtime_error);
+    ament_index_cpp::get_package_prefix("", path_result),
+    ament_index_cpp::PackageNotFoundError);
 }
 
-TEST(AmentIndexCpp, get_package_share_directory) {
+TEST(AmentIndexCpp, get_package_share_path) {
   // Ensure that a known to exist package is found and the share directory is correct.
   std::list<std::string> subfolders;
   subfolders.push_back("prefix1");  // only contains foo and bar packages
   subfolders.push_back("prefix2");  // only contains bar and baz packages
   set_ament_prefix_path(subfolders);
   // bar is in both, but prefix 1 takes precedence
+  auto path_result = ament_index_cpp::get_package_share_path("bar");
   EXPECT_EQ(
-    generate_subfolder_path("prefix1") + "/share/bar",
-    ament_index_cpp::get_package_share_directory("bar"));
+    std::filesystem::path(generate_subfolder_path("prefix1")) / "share" / "bar",
+    path_result);
 }
 
 TEST(AmentIndexCpp, get_packages_with_prefixes) {
@@ -278,32 +275,29 @@ TEST(AmentIndexCpp, get_packages_with_prefixes) {
 }
 
 TEST(AmentIndexCpp, has_empty_name) {
-  EXPECT_THROW(
-    ament_index_cpp::has_resource("type", ""),
-    std::runtime_error);
+  auto result = ament_index_cpp::is_resource_available("type", "");
+  EXPECT_EQ(result, std::nullopt);
 }
 
 TEST(AmentIndexCpp, has_empty_type) {
-  EXPECT_THROW(
-    ament_index_cpp::has_resource("", "name"),
-    std::runtime_error);
+  auto result = ament_index_cpp::is_resource_available("", "name");
+  EXPECT_EQ(result, std::nullopt);
 }
 
 TEST(AmentIndexCpp, has_unknown_resource) {
-  bool success = ament_index_cpp::has_resource("resource_type4", "bar21");
-  EXPECT_FALSE(success);
+  auto result = ament_index_cpp::is_resource_available("resource_type4", "bar21");
+  EXPECT_EQ(result, std::nullopt);
 }
 
 TEST(AmentIndexCpp, has_resource) {
-  std::string result_path;
+  auto result = ament_index_cpp::is_resource_available("resource_type1", "foo");
+  EXPECT_EQ(result.value().string(), generate_subfolder_path("prefix1"));
+  result = ament_index_cpp::is_resource_available("resource_type3", "bar");
+  EXPECT_NE(result, std::nullopt);
 
-  EXPECT_TRUE(ament_index_cpp::has_resource("resource_type1", "foo", &result_path));
-  EXPECT_EQ(result_path, generate_subfolder_path("prefix1"));
+  result = ament_index_cpp::is_resource_available("packages", "baz");
+  EXPECT_NE(result, std::nullopt);
 
-  EXPECT_TRUE(ament_index_cpp::has_resource("resource_type3", "bar"));
-
-  EXPECT_TRUE(ament_index_cpp::has_resource("packages", "baz", &result_path));
-  EXPECT_EQ(result_path, generate_subfolder_path("prefix2"));
-
-  EXPECT_FALSE(ament_index_cpp::has_resource("resource_type1", "resource", &result_path));
+  result = ament_index_cpp::is_resource_available("resource_type1", "resource");
+  EXPECT_EQ(result, std::nullopt);
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include "ament_index_cpp/get_package_share_path.hpp"
 
 #include <filesystem>
 #include <string>
@@ -25,14 +26,14 @@ namespace ament_index_cpp
 std::string
 get_package_share_directory(const std::string & package_name)
 {
-  return get_package_prefix(package_name) + "/share/" + package_name;
+  return get_package_share_path(package_name).string();
 }
 
 void get_package_share_directory(
   const std::string & package_name,
   std::filesystem::path & path)
 {
-  path = get_package_share_directory(package_name);
+  path = get_package_share_path(package_name);
 }
 
 }  // namespace ament_index_cpp
