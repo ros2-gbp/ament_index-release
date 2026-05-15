@@ -14,6 +14,9 @@
 
 #include "ament_index_cpp/get_search_paths.hpp"
 
+#include <sys/stat.h>
+
+#include <iostream>
 #include <cstdlib>
 #include <filesystem>
 #include <list>
@@ -21,11 +24,15 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef _WIN32
+#define stat _stat
+#endif
+
 namespace ament_index_cpp
 {
 
-std::list<std::filesystem::path>
-get_searcheable_paths()
+std::list<std::string>
+get_search_paths()
 {
   char * ament_prefix_path = nullptr;
   const char * env_var = "AMENT_PREFIX_PATH";
@@ -42,7 +49,7 @@ get_searcheable_paths()
   }
 
   // split at token into separate paths
-  std::list<std::filesystem::path> paths;
+  std::list<std::string> paths;
   std::stringstream ss(ament_prefix_path);
   std::string tok;
 #ifndef _WIN32
@@ -54,9 +61,13 @@ get_searcheable_paths()
     if (tok.empty()) {
       continue;
     }
-    // skip non-existing paths and non-directories
-    if (std::filesystem::is_directory(tok)) {
-      paths.push_back(std::filesystem::path(tok));
+    // skip non existing directories
+    struct stat s;
+    if (stat(tok.c_str(), &s)) {
+      continue;
+    }
+    if ((s.st_mode & S_IFMT) == S_IFDIR) {
+      paths.push_back(tok);
     }
   }
 
@@ -69,15 +80,14 @@ get_searcheable_paths()
   return paths;
 }
 
-std::list<std::string>
-get_search_paths()
+std::list<std::filesystem::path>
+get_searcheable_paths()
 {
-  std::list<std::string> result;
-  auto paths = get_searcheable_paths();
-  for (const auto & path : paths) {
-    result.push_back(path.string());
+  std::list<std::filesystem::path> paths;
+  for (const auto & path : get_search_paths()) {
+    paths.emplace_back(path);
   }
-  return result;
+  return paths;
 }
 
 }  // namespace ament_index_cpp

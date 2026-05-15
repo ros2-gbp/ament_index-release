@@ -14,7 +14,7 @@
 
 #include "ament_index_cpp/get_package_prefix.hpp"
 
-#include <mutex>
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -24,7 +24,7 @@
 namespace ament_index_cpp
 {
 
-static std::once_flag search_paths_included;
+static size_t package_not_found_count = 0;
 
 static
 std::string
@@ -32,17 +32,15 @@ format_package_not_found_error_message(const std::string & package_name)
 {
   std::string message = "package '" + package_name + "' not found";
 
-  // Include the search paths in the error message only once (thread-safe)
-  bool include_paths = false;
-  std::call_once(search_paths_included, [&include_paths]() {include_paths = true;});
-  if (!include_paths) {
+  // Don't need to print out the package paths more than once
+  if (package_not_found_count++ > 0) {
     return message;
   }
 
   message += ", searching: [";
-  auto search_paths = get_searcheable_paths();
+  auto search_paths = get_search_paths();
   for (const auto & path : search_paths) {
-    message += path.string() + ", ";
+    message += path + ", ";
   }
   if (search_paths.size() > 0) {
     message = message.substr(0, message.size() - 2);
@@ -60,18 +58,21 @@ PackageNotFoundError::~PackageNotFoundError() {}
 std::string
 get_package_prefix(const std::string & package_name)
 {
-  std::filesystem::path result;
-  get_package_prefix(package_name, result);
-  return result.string();
+  std::string content;
+  std::string prefix_path;
+  if (!get_resource("packages", package_name, content, &prefix_path)) {
+    throw PackageNotFoundError(package_name);
+  }
+  return prefix_path;
 }
 
 void
 get_package_prefix(const std::string & package_name, std::filesystem::path & path)
 {
-  auto result = get_resource("packages", package_name);
-  if (result.resourcePath == std::nullopt) {
+  try {
+    path = get_package_prefix(package_name);
+  } catch (const std::runtime_error &) {
     throw PackageNotFoundError(package_name);
   }
-  path = result.resourcePath.value().string();
 }
 }  // namespace ament_index_cpp

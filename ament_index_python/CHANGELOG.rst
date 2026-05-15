@@ -2,29 +2,16 @@
 Changelog for package ament_index_python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.14.0 (2026-05-05)
+1.11.4 (2026-05-15)
 -------------------
 
-1.13.3 (2026-04-08)
--------------------
-* Cleanups ament_index_python (`#115 <https://github.com/ament/ament_index/issues/115>`_)
-* Contributors: Alejandro Hernández Cordero
-
-1.13.2 (2026-02-25)
+1.11.3 (2026-01-04)
 -------------------
 
-1.13.1 (2026-01-09)
+1.11.2 (2026-01-12)
 -------------------
 
-1.13.0 (2025-12-23)
--------------------
-
-1.12.1 (2025-07-30)
--------------------
-* fix setuptools deprecations (`#101 <https://github.com/ament/ament_index/issues/101>`_)
-* Contributors: mosfet80
-
-1.12.0 (2025-04-24)
+1.11.1 (2025-12-23)
 -------------------
 
 1.11.0 (2025-04-24)

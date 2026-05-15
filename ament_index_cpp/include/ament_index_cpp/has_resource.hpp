@@ -32,7 +32,6 @@ namespace ament_index_cpp
  * \return `true` if resource exists,`false` otherwise
  * \throws std::runtime_error if resource_type or resource_name are empty
  */
-[[deprecated("Use is_resource_available(...) instead")]]
 AMENT_INDEX_CPP_PUBLIC
 bool
 has_resource(
@@ -44,8 +43,8 @@ has_resource(
 /**
  * \param[in] resource_type type of the resource
  * \param[in] resource_name name of the resource
- * \return the installation prefix of the given resource if found or std::nullopt otherwise.
- *         Returns std::nullopt (does not throw) if resource_type or resource_name are empty.
+ * \return the installation prefix of the given resource if found or std::nullptr otherwise
+ * \throws std::runtime_error if resource_type or resource_name are empty
  */
 AMENT_INDEX_CPP_PUBLIC
 std::optional<std::filesystem::path>

@@ -61,7 +61,7 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
 
     :param resource_type: the type of the resource
     :type resource_type: str
-    :param resource_name: the name of the resource
+    :param resource_names: the name of the resource
     :type resource_name: str
     :returns: a tuple of the content (bytes) of the resource and its prefix path
     :raises: :exc:`EnvironmentError`
@@ -70,16 +70,14 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
     :raises: :exc:`InvalidResourceTypeNameError`
     :raises: :exc:`InvalidResourceNameError`
     """
-    if not resource_type:
-        raise ValueError('The resource type must not be empty')
-    if not resource_name:
-        raise ValueError('The resource name must not be empty')
+    assert resource_type, 'The resource type must not be empty'
+    assert resource_name, 'The resource name must not be empty'
     if _name_is_invalid(resource_type):
         raise InvalidResourceTypeNameError(
-            f"Resource type '{resource_type}' is invalid")
+            "Resource type '%s' is invalid" % resource_type)
     if _name_is_invalid(resource_name):
         raise InvalidResourceNameError(
-            f"Resource name '{resource_name}' is invalid")
+            "Resource name '%s' is invalid" % resource_name)
     for path in get_search_paths():
         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)
         if os.path.isfile(resource_path):
@@ -88,11 +86,11 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
                     content = h.read()
             except OSError as e:
                 raise OSError(
-                    f"Could not open the resource '{resource_name}' of type "
-                    f"'{resource_type}':\n{e}") from e
+                    "Could not open the resource '%s' of type '%s':\n%s"
+                    % (resource_name, resource_type, e))
             return content, path
     raise LookupError(
-        f"Could not find the resource '{resource_name}' of type '{resource_type}'")
+        "Could not find the resource '%s' of type '%s'" % (resource_name, resource_type))
 
 
 def get_resources(resource_type: str) -> Dict[str, str]:
@@ -105,11 +103,10 @@ def get_resources(resource_type: str) -> Dict[str, str]:
     :raises: :exc:`EnvironmentError`
     :raises: :exc:`InvalidResourceTypeNameError`
     """
-    if not resource_type:
-        raise ValueError('The resource type must not be empty')
+    assert resource_type, 'The resource type must not be empty'
     if _name_is_invalid(resource_type):
         raise InvalidResourceTypeNameError(
-            f"Resource type '{resource_type}' is invalid")
+            "Resource type '%s' is invalid" % resource_type)
     resources = {}
     for path in get_search_paths():
         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type)
