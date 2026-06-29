@@ -14,11 +14,9 @@
 
 #include "ament_index_cpp/get_resource.hpp"
 
-#include <filesystem>
 #include <fstream>
 #include <optional>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -31,48 +29,24 @@ get_resource(
   const std::string & resource_type,
   const std::string & resource_name)
 {
-  try {
-    std::string content;
-    std::string prefix_path;
-    const auto success = get_resource(resource_type, resource_name, content, &prefix_path);
-    if (!success) {
-      return PathWithResource{std::nullopt, ""};
-    }
-    return PathWithResource{std::filesystem::path(prefix_path), content};
-  } catch (const std::runtime_error &) {
+  if (resource_type.empty()) {
     return PathWithResource{std::nullopt, ""};
   }
-}
-
-bool
-get_resource(
-  const std::string & resource_type,
-  const std::string & resource_name,
-  std::string & content,
-  std::string * prefix_path)
-{
-  if (resource_type.empty()) {
-    throw std::runtime_error("ament_index_cpp::get_resource() resource type must not be empty");
-  }
   if (resource_name.empty()) {
-    throw std::runtime_error("ament_index_cpp::get_resource() resource name must not be empty");
+    return PathWithResource{std::nullopt, ""};
   }
-  auto paths = get_search_paths();
-  for (auto path : paths) {
-    auto resource_path = path + "/share/ament_index/resource_index/" +
-      resource_type + "/" + resource_name;
-    std::ifstream s(resource_path);
+  auto paths = get_searcheable_paths();
+  for (const auto & path : paths) {
+    auto resource_path = path / "share" / "ament_index" / "resource_index" /
+      resource_type / resource_name;
+    std::ifstream s(resource_path.string());
     if (s.is_open()) {
       std::stringstream buffer;
       buffer << s.rdbuf();
-      content = buffer.str();
-      if (prefix_path) {
-        *prefix_path = path;
-      }
-      return true;
+      return PathWithResource{std::filesystem::path(path), buffer.str()};
     }
   }
-  return false;
+  return PathWithResource{std::nullopt, ""};
 }
 
 }  // namespace ament_index_cpp

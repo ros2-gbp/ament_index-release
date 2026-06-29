@@ -14,44 +14,13 @@
 
 #include "ament_index_cpp/has_resource.hpp"
 
-#include <filesystem>
 #include <fstream>
-#include <optional>
-#include <stdexcept>
 #include <string>
 
 #include "ament_index_cpp/get_search_paths.hpp"
 
 namespace ament_index_cpp
 {
-
-bool
-has_resource(
-  const std::string & resource_type,
-  const std::string & resource_name,
-  std::string * prefix_path)
-{
-  if (resource_type.empty()) {
-    throw std::runtime_error("ament_index_cpp::has_resource() resource type must not be empty");
-  }
-  if (resource_name.empty()) {
-    throw std::runtime_error("ament_index_cpp::has_resource() resource name must not be empty");
-  }
-  auto paths = get_search_paths();
-  for (auto path : paths) {
-    auto resource_path = path + "/share/ament_index/resource_index/" +
-      resource_type + "/" + resource_name;
-    std::ifstream s(resource_path);
-    if (s.is_open()) {
-      if (prefix_path) {
-        *prefix_path = path;
-      }
-      return true;
-    }
-  }
-  return false;
-}
-
 
 std::optional<std::filesystem::path>
 is_resource_available(
@@ -60,15 +29,16 @@ is_resource_available(
 {
   std::optional<std::filesystem::path> result = std::nullopt;
 
-  try {
-    std::string prefix_path;
-    if (has_resource(resource_type, resource_name, &prefix_path)) {
-      result.emplace(prefix_path);
+  auto paths = get_searcheable_paths();
+  for (const auto & path : paths) {
+    auto resource_path = path / "share" / "ament_index" / "resource_index" /
+      resource_type / resource_name;
+    std::ifstream s(resource_path.string());
+    if (s.is_open()) {
+      result = path;
+      return result;
     }
-  } catch (const std::runtime_error &) {
-    // just keep nullopt in result
   }
-
   return result;
 }
 

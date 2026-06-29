@@ -21,17 +21,19 @@ from ament_index_python.resources import get_resource_types
 from ament_index_python.resources import get_resources
 
 
-def main(argv: List[str] = sys.argv[1:]) -> Optional[str]:
+def main(argv: Optional[List[str]] = None) -> Optional[str]:
+    if argv is None:
+        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description='Query the ament resource index.')
     arg = parser.add_argument(
         'resource_type', nargs='?', metavar='TYPE',
         help='The type of the resource')
-    arg.completer = resource_type_completer
+    arg.completer = resource_type_completer  # type: ignore[attr-defined]
     arg = parser.add_argument(
         'resource_name', nargs='?', metavar='NAME',
         help='The name of the resource')
-    arg.completer = resource_name_completer
+    arg.completer = resource_name_completer  # type: ignore[attr-defined]
 
     try:
         from argcomplete import autocomplete
