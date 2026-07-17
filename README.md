@@ -1,3 +1,28 @@
+## ament_index (rolling) - 1.14.2-1
+
+The packages in the `ament_index` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ament_index` on `Fri, 17 Jul 2026 14:45:17 -0000`
+
+These packages were released:
+- `ament_index_cpp`
+- `ament_index_python`
+
+Version of package(s) in repository `ament_index`:
+
+- upstream repository: https://github.com/ament/ament_index.git
+- release repository: https://github.com/ros2-gbp/ament_index-release.git
+- rosdistro version: `1.14.1-1`
+- old version: `1.14.1-1`
+- new version: `1.14.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.14.3`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## ament_index (rolling) - 1.14.1-1
 
 The packages in the `ament_index` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ament_index` on `Mon, 29 Jun 2026 17:08:13 -0000`
