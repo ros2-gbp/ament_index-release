@@ -13,13 +13,8 @@
 # limitations under the License.
 
 import os
-import sys
-from typing import Dict, Literal, Tuple, Union
-
-if sys.version_info >= (3, 10):
-    Set = set
-else:
-    from typing import Set
+from pathlib import Path
+from typing import Literal
 
 from .constants import RESOURCE_INDEX_SUBFOLDER
 from .search_paths import get_search_paths
@@ -28,13 +23,9 @@ from .search_paths import get_search_paths
 class InvalidResourceTypeNameError(ValueError):
     """Raised when a resource type name is invalid."""
 
-    pass
-
 
 class InvalidResourceNameError(ValueError):
     """Raised when a resource name is invalid."""
-
-    pass
 
 
 def _name_is_invalid(resource_name: str) -> bool:
@@ -55,7 +46,7 @@ def _name_is_invalid(resource_name: str) -> bool:
     return ('/' in resource_name) or ('\\' in resource_name)
 
 
-def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
+def get_resource(resource_type: str, resource_name: str) -> tuple[str, str]:
     """
     Get the content of a specific resource and its prefix path.
 
@@ -64,7 +55,6 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
     :param resource_name: the name of the resource
     :type resource_name: str
     :returns: a tuple of the content (bytes) of the resource and its prefix path
-    :raises: :exc:`EnvironmentError`
     :raises: :exc:`OSError`
     :raises: :exc:`LookupError`
     :raises: :exc:`InvalidResourceTypeNameError`
@@ -81,11 +71,10 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
         raise InvalidResourceNameError(
             f"Resource name '{resource_name}' is invalid")
     for path in get_search_paths():
-        resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)
-        if os.path.isfile(resource_path):
+        resource_path = Path(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)
+        if resource_path.is_file():
             try:
-                with open(resource_path, 'r') as h:
-                    content = h.read()
+                content = resource_path.read_text(encoding='utf-8')
             except OSError as e:
                 raise OSError(
                     f"Could not open the resource '{resource_name}' of type "
@@ -95,14 +84,14 @@ def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:
         f"Could not find the resource '{resource_name}' of type '{resource_type}'")
 
 
-def get_resources(resource_type: str) -> Dict[str, str]:
+def get_resources(resource_type: str) -> dict[str, str]:
     """
     Get the resource names of all resources of the specified type.
 
     :param resource_type: the type of the resource
     :type resource_type: str
     :returns: dict of resource names to the prefix path they are in
-    :raises: :exc:`EnvironmentError`
+    :raises: :exc:`OSError`
     :raises: :exc:`InvalidResourceTypeNameError`
     """
     if not resource_type:
@@ -112,39 +101,39 @@ def get_resources(resource_type: str) -> Dict[str, str]:
             f"Resource type '{resource_type}' is invalid")
     resources = {}
     for path in get_search_paths():
-        resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type)
-        if os.path.isdir(resource_path):
-            for resource in os.listdir(resource_path):
-                # Ignore subdirectories, and anything starting with a dot
-                if os.path.isdir(os.path.join(resource_path, resource)) \
-                        or resource.startswith('.'):
-                    continue
-                if resource not in resources:
-                    resources[resource] = path
+        resource_path = Path(path, RESOURCE_INDEX_SUBFOLDER, resource_type)
+        if resource_path.is_dir():
+            with os.scandir(resource_path) as entries:
+                for entry in entries:
+                    # Ignore subdirectories, and anything starting with a dot
+                    if entry.is_dir() or entry.name.startswith('.'):
+                        continue
+                    if entry.name not in resources:
+                        resources[entry.name] = path
     return resources
 
 
-def get_resource_types() -> Set[str]:
+def get_resource_types() -> set[str]:
     """
     Get the resource types.
 
     :returns: set of resource types within the search paths
-    :raises: :exc:`EnvironmentError`
+    :raises: :exc:`OSError`
     """
     resource_types = set()
     for path in get_search_paths():
-        basepath = os.path.join(path, RESOURCE_INDEX_SUBFOLDER)
-        if os.path.isdir(basepath):
-            for resource_type in os.listdir(basepath):
-                # Ignore non-subdirectories, and anything starting with a dot
-                if not os.path.isdir(os.path.join(basepath, resource_type)) \
-                        or resource_type.startswith('.'):
-                    continue
-                resource_types.add(resource_type)
+        basepath = Path(path, RESOURCE_INDEX_SUBFOLDER)
+        if basepath.is_dir():
+            with os.scandir(basepath) as entries:
+                for entry in entries:
+                    # Ignore non-subdirectories, and anything starting with a dot
+                    if not entry.is_dir() or entry.name.startswith('.'):
+                        continue
+                    resource_types.add(entry.name)
     return resource_types
 
 
-def has_resource(resource_type: str, resource_name: str) -> Union[str, Literal[False]]:
+def has_resource(resource_type: str, resource_name: str) -> str | Literal[False]:
     """
     Check if a specific resource exists.
 
@@ -153,7 +142,7 @@ def has_resource(resource_type: str, resource_name: str) -> Union[str, Literal[F
     :param resource_names: the name of the resource
     :type resource_name: str
     :returns: The prefix path if the resource exists, False otherwise
-    :raises: :exc:`EnvironmentError`
+    :raises: :exc:`OSError`
     :raises: :exc:`InvalidResourceTypeNameError`
     :raises: :exc:`InvalidResourceNameError`
     """
@@ -161,12 +150,12 @@ def has_resource(resource_type: str, resource_name: str) -> Union[str, Literal[F
     assert resource_name, 'The resource name must not be empty'
     if _name_is_invalid(resource_type):
         raise InvalidResourceTypeNameError(
-            "Resource type '%s' is invalid" % resource_type)
+            f"Resource type '{resource_type}' is invalid")
     if _name_is_invalid(resource_name):
         raise InvalidResourceNameError(
-            "Resource name '%s' is invalid" % resource_name)
+            f"Resource name '{resource_name}' is invalid")
     for path in get_search_paths():
-        resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)
-        if os.path.isfile(resource_path):
+        resource_path = Path(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)
+        if resource_path.is_file():
             return path
     return False
